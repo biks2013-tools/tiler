@@ -180,6 +180,17 @@
 
 ## Release log
 
+- **2026-10-19 — v0.8.2 (build 19).** Light-green frame around the active window on tiled
+  desktops; focus follows mouse no longer raises a tiled window over an untiled one. 33 tests
+  passed; app and disk image `status: Accepted`, `source=Notarized Developer ID`. Zip SHA-256
+  `c9e96c80c7a44274fa7cb57f9172173347e4f3c65c5fe95d27d5316a11bd5e06` (download verified), DMG
+  `b29fb10d755d1cc198daa79d1f240e552f0a39ef96dab284d62463d187d1c934`. Tap commit `tiler 0.8.2`
+  (42a0015); `brew audit` clean. The scratch install failed because brew still recorded the
+  previous scratch install (0.8.1 in a deleted temporary folder); the record was removed and
+  `brew install --cask --adopt` adopted `/Applications/Tiler.app` (0.8.2), which also exercised
+  the release zip. Pages serves the 0.8.2 decks. Config gains `activeBorder` and
+  `activeBorderWidth` (Add Missing Settings). Deck builds now point at nbg-design 1.26.0.
+
 - **2026-10-10 — v0.8.1 (build 18).** ⌥⌘ + drag swaps reliably and keeps the dragged window on
   top; window lookup falls back to the window server; new windows split the active window;
   launching apps tile at once. 32 tests passed; app and disk image `status: Accepted`,
