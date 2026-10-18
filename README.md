@@ -57,6 +57,13 @@ do by hand: it holds the window by its title bar and presses your Mission Contro
 Keyboard Shortcuts → Mission Control (they are on by default; a customised key is fine). Tiler
 says so if there is no desktop on that side, or if it is a full-screen app's space.
 
+### Frame around the active window
+
+On a tiled desktop the window that has focus gets a light-green frame (`#90EE90`, 4 pt) in the
+gap around it, so it is obvious where your typing goes. Windows above it still cover the frame.
+Change the colour and width, or turn it off, in Settings → General → **Active window** (config
+keys `activeBorder` and `activeBorderWidth`).
+
 ### Drag a window from anywhere in it
 
 Hold `⌘⌥` and drag anywhere inside a window to move it, on any desktop, tiled or not. The click

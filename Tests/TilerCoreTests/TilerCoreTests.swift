@@ -336,5 +336,33 @@ final class ConfigUpgradeTests: XCTestCase {
         let upgraded = try Config.addingMissingSettings(to: try JSONSerialization.data(withJSONObject: dict))
         XCTAssertEqual(upgraded.added, ["dragToMove"])
     }
+
+    func testActiveBorder() throws {
+        XCTAssertEqual(Config.defaults.activeBorder, 0x90EE90)
+        XCTAssertEqual(Config.defaults.activeBorderWidth, 4)
+        var dict = try JSONSerialization.jsonObject(with: Data(Config.template.utf8)) as! [String: Any]
+        for bad: Any in ["green", "#12345", "#1234567", "#GGHHII", "", 5, true] {
+            dict["activeBorder"] = bad
+            XCTAssertThrowsError(try Config.parse(try JSONSerialization.data(withJSONObject: dict)), "\(bad)")
+        }
+        dict["activeBorder"] = "none"
+        XCTAssertNil(try Config.parse(try JSONSerialization.data(withJSONObject: dict)).activeBorder)
+        dict["activeBorder"] = "#a6e3a1"
+        for bad: Any in [0, 13, "4", true] {
+            dict["activeBorderWidth"] = bad
+            XCTAssertThrowsError(try Config.parse(try JSONSerialization.data(withJSONObject: dict)), "\(bad)")
+        }
+        dict["activeBorderWidth"] = 6
+        let c = try Config.parse(try JSONSerialization.data(withJSONObject: dict))
+        XCTAssertEqual(c.activeBorder, 0xA6E3A1)
+        XCTAssertTrue(c.json().contains("\"activeBorder\": \"#A6E3A1\""))
+        XCTAssertTrue(c.json().contains("\"activeBorderWidth\": 6"))
+        XCTAssertEqual(try Config.parse(Data(c.json().utf8)), c)
+        dict["activeBorder"] = nil
+        dict["activeBorderWidth"] = nil
+        XCTAssertThrowsError(try Config.parse(try JSONSerialization.data(withJSONObject: dict)))
+        let upgraded = try Config.addingMissingSettings(to: try JSONSerialization.data(withJSONObject: dict))
+        XCTAssertEqual(upgraded.added, ["activeBorder", "activeBorderWidth"])
+    }
 }
 

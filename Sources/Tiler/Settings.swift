@@ -104,15 +104,19 @@ final class SettingsModel: ObservableObject {
         var focusFollowsMouse: Bool
         var focusDelay: Double
         var dragToMove: UInt32?
+        var activeBorder: UInt32?
+        var activeBorderWidth: Double
         init(_ c: Config) {
             innerGap = c.innerGap; outerGap = c.outerGap; resizeStep = c.resizeStep
             floatingApps = c.floatingApps; hotkeys = c.hotkeys
             focusFollowsMouse = c.focusFollowsMouse; focusDelay = c.focusDelay
             dragToMove = c.dragToMove
+            activeBorder = c.activeBorder; activeBorderWidth = c.activeBorderWidth
         }
         var config: Config {
             Config(innerGap: innerGap, outerGap: outerGap, resizeStep: resizeStep, floatingApps: floatingApps, hotkeys: hotkeys,
-                   focusFollowsMouse: focusFollowsMouse, focusDelay: focusDelay, dragToMove: dragToMove)
+                   focusFollowsMouse: focusFollowsMouse, focusDelay: focusDelay, dragToMove: dragToMove,
+                   activeBorder: activeBorder, activeBorderWidth: activeBorderWidth)
         }
     }
 }
@@ -250,6 +254,24 @@ private struct GeneralPane: View {
                 Text("Focus")
             } footer: {
                 Footnote("On tiled desktops, the window under the pointer gets focus once the pointer rests for the delay. Menus, popovers and floating windows on top are respected, and nothing happens on desktops Tiler does not tile.")
+            }
+            Section {
+                Toggle("Frame the active window", isOn: Binding(
+                    get: { model.config.activeBorder != nil },
+                    set: { on in model.update { $0.activeBorder = on ? Config.defaults.activeBorder : nil } }))
+                    .disabled(!model.editable)
+                ColorPicker("Colour", selection: Binding(
+                    get: { Color(nsColor: NSColor(rgb: model.config.activeBorder ?? Config.defaults.activeBorder ?? 0)) },
+                    set: { c in if let v = NSColor(c).rgb { model.update { $0.activeBorder = v } } }), supportsOpacity: false)
+                    .disabled(!model.editable || model.config.activeBorder == nil)
+                PointsSlider(title: "Width", value: model.config.activeBorderWidth, range: 1...12) { v in
+                    model.update { $0.activeBorderWidth = v }
+                }
+                .disabled(!model.editable || model.config.activeBorder == nil)
+            } header: {
+                Text("Active window")
+            } footer: {
+                Footnote("On tiled desktops, a frame in the gap around the window that has focus. Windows above it still cover it.")
             }
             Section {
                 Picker("Drag windows with", selection: Binding(get: { model.config.dragToMove ?? 0 },

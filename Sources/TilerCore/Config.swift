@@ -232,10 +232,18 @@ public struct Config: Equatable {
     /// The modifiers (Carbon mask) that, held while pressing the mouse button,
     /// drag the window under the pointer from anywhere in it. Nil = off.
     public let dragToMove: UInt32?
+    /// Colour (0xRRGGBB) of the frame drawn around the active window on tiled
+    /// desktops. Nil = no frame.
+    public let activeBorder: UInt32?
+    /// Width of that frame in points (1...12).
+    public let activeBorderWidth: Double
 
     public init(innerGap: Double, outerGap: Double, resizeStep: Double, floatingApps: Set<String>, hotkeys: [Action: KeyCombo],
-                focusFollowsMouse: Bool, focusDelay: Double, dragToMove: UInt32?) {
+                focusFollowsMouse: Bool, focusDelay: Double, dragToMove: UInt32?,
+                activeBorder: UInt32?, activeBorderWidth: Double) {
         self.dragToMove = dragToMove
+        self.activeBorder = activeBorder
+        self.activeBorderWidth = activeBorderWidth
         self.focusFollowsMouse = focusFollowsMouse
         self.focusDelay = focusDelay
         self.innerGap = innerGap
@@ -271,6 +279,8 @@ public struct Config: Equatable {
           "focusFollowsMouse": \(focusFollowsMouse),
           "focusDelay": \(num(focusDelay)),
           "dragToMove": \(str(dragToMove.map { KeyCombo.text(modifiers: $0) } ?? "none")),
+          "activeBorder": \(str(activeBorder.map(Self.colorText) ?? "none")),
+          "activeBorderWidth": \(num(activeBorderWidth)),
           "floatingApps": [\(apps.isEmpty ? "" : "\n" + apps + "\n  ")],
           "hotkeys": {
         \(keys)
@@ -307,7 +317,20 @@ public struct Config: Equatable {
     }
 
     public static let topLevelKeys: Set<String> = ["innerGap", "outerGap", "resizeStep", "focusFollowsMouse", "focusDelay",
-                                                   "dragToMove", "floatingApps", "hotkeys"]
+                                                   "dragToMove", "activeBorder", "activeBorderWidth", "floatingApps", "hotkeys"]
+
+    /// "#RRGGBB" for a 0xRRGGBB colour.
+    public static func colorText(_ rgb: UInt32) -> String { String(format: "#%06X", rgb & 0xFFFFFF) }
+
+    /// Parse the `activeBorder` value: "none", or a colour "#RRGGBB".
+    public static func parseColor(_ raw: String) throws -> UInt32? {
+        let text = raw.trimmingCharacters(in: .whitespaces)
+        if text.lowercased() == "none" { return nil }
+        guard text.count == 7, text.hasPrefix("#"), let v = UInt32(text.dropFirst(), radix: 16) else {
+            throw ConfigError.badValue("activeBorder", "must be a colour such as \"#90EE90\", or \"none\"")
+        }
+        return v
+    }
 
     /// Parse the `dragToMove` value: "none", or modifiers such as "alt+cmd".
     /// Shift alone is refused: shift-click extends selections everywhere.
@@ -352,6 +375,12 @@ public struct Config: Equatable {
         guard let rawDrag = dict["dragToMove"] else { throw ConfigError.missingKey("dragToMove") }
         guard let dragText = rawDrag as? String else { throw ConfigError.badValue("dragToMove", "must be a string such as \"alt+cmd\" or \"none\"") }
         let drag = try parseDragModifiers(dragText)
+        guard let rawBorder = dict["activeBorder"] else { throw ConfigError.missingKey("activeBorder") }
+        guard let borderText = rawBorder as? String else {
+            throw ConfigError.badValue("activeBorder", "must be a string such as \"#90EE90\" or \"none\"")
+        }
+        let border = try parseColor(borderText)
+        let borderWidth = try number("activeBorderWidth", 1...12)
         let outer = try number("outerGap", 0...400)
         let step = try number("resizeStep", 0.01...0.5)
 
@@ -371,7 +400,8 @@ public struct Config: Equatable {
             hotkeys[action] = combo
         }
         return Config(innerGap: inner, outerGap: outer, resizeStep: step, floatingApps: Set(apps), hotkeys: hotkeys,
-                      focusFollowsMouse: follow, focusDelay: delay, dragToMove: drag)
+                      focusFollowsMouse: follow, focusDelay: delay, dragToMove: drag,
+                      activeBorder: border, activeBorderWidth: borderWidth)
     }
 
     /// The file written on first launch. Edit it and choose "Reload Config".
@@ -383,6 +413,8 @@ public struct Config: Equatable {
       "focusFollowsMouse": false,
       "focusDelay": 0.15,
       "dragToMove": "alt+cmd",
+      "activeBorder": "#90EE90",
+      "activeBorderWidth": 4,
       "floatingApps": [
         "com.apple.systempreferences",
         "com.apple.ActivityMonitor",

@@ -426,7 +426,11 @@ final class Controller {
             if userDragging {
                 // A user drag: act once the button is released.
                 if drag == nil { beginDrag(of: id, on: tiled) }
-            } else if tiled == nil {
+                return
+            }
+            // The framed window moved (a layout, the app itself): the frame follows.
+            if id == activeBorder.windowID || id == focused?.id { updateBorder() }
+            if tiled == nil {
                 // Something (a script, the app itself) moved an untiled window:
                 // it may have landed on a tiled desktop. The window server updates
                 // its Space a moment after the move, so look again shortly.
@@ -557,6 +561,7 @@ final class Controller {
         }
 
         for (pid, ids) in toResolve { resolve(ids, of: pid) }
+        updateBorder()
     }
 
     private func isFloatingApp(_ pid: pid_t?) -> Bool {
@@ -599,6 +604,15 @@ final class Controller {
             handle.setFrame(id, frame)
             d.applied[id] = frame
         }
+        // Some apps settle on their own size a moment after the write (minimum
+        // sizes, size increments) without a further notification: look once more.
+        if activeBorder.windowID != nil || focused?.id.map({ d.owns($0) }) == true, !borderRecheckScheduled {
+            borderRecheckScheduled = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+                self?.borderRecheckScheduled = false
+                self?.updateBorder()
+            }
+        }
     }
 
     // MARK: Mouse drags
@@ -614,6 +628,7 @@ final class Controller {
         }
         RunLoop.main.add(timer, forMode: .common)
         drag = (d?.key, id, timer)
+        activeBorder.hide()
     }
 
     /// A modifier + drag picked up a window. Its moved notifications may come
@@ -636,7 +651,7 @@ final class Controller {
         timer.invalidate()
         drag = nil
         // A dragged untiled window may have been dropped onto a tiled desktop.
-        guard let key else { scheduleReconcile(); return }
+        guard let key else { scheduleReconcile(); updateBorder(); return }
         let mouse = point ?? CGEvent(source: nil)?.location ?? .zero
         guard let pid = facts[id]?.pid, let handle = apps[pid] else { return }
         handle.frame(of: id) { [weak self] frame in
@@ -654,6 +669,8 @@ final class Controller {
             }
             d.applied[id] = nil
             layout(d)
+            // A window that ends where it already is reports no move.
+            updateBorder()
         }
     }
 
@@ -805,8 +822,43 @@ final class Controller {
     private func updateHotkeys() {
         guard started else { return }
         hotkeys.activate(tilingKeys: config != nil && keyboardContext() != nil)
+        updateBorder()
         onChange?()
     }
+
+    // MARK: Active window frame
+
+    private let activeBorder = ActiveBorder()
+
+    /// Frame the focused window when it belongs to a visible tiled desktop
+    /// (tile or floating) and is on screen; otherwise no frame. Also off while
+    /// a window is being dragged; the drop's layout brings it back.
+    private func updateBorder() {
+        borderGeneration &+= 1
+        guard started, let config, config.activeBorder != nil, drag == nil, !windowDrag.isActive,
+              let id = focused?.id,
+              let d = desktops.values.first(where: { $0.owns(id) }),
+              Spaces.current(onDisplay: d.key.displayUUID) == d.spaceID,
+              let info = (CGWindowListCopyWindowInfo(.optionIncludingWindow, id) as? [[String: Any]])?.first,
+              info[kCGWindowIsOnscreen as String] as? Bool == true,
+              let b = info[kCGWindowBounds as String] as? NSDictionary,
+              let listed = CGRect(dictionaryRepresentation: b)
+        else { activeBorder.hide(); return }
+        // The window-server list can lag a moment behind a resize the app has
+        // already reported (a window closed, its neighbour grows): take the
+        // frame from the app itself, read after any frame Tiler is writing.
+        let generation = borderGeneration
+        let show: (CGRect) -> Void = { [weak self] frame in
+            guard let self, generation == borderGeneration, let config = self.config, let rgb = config.activeBorder else { return }
+            activeBorder.show(around: id, frame: frame, color: NSColor(rgb: rgb), width: config.activeBorderWidth)
+        }
+        guard let pid = facts[id]?.pid, let handle = apps[pid] else { show(listed); return }
+        handle.frame(of: id) { frame in show(frame ?? listed) }
+    }
+
+    /// Bumped by every `updateBorder`, so a slower answer never overrides a newer one.
+    private var borderGeneration = 0
+    private var borderRecheckScheduled = false
 
     private func perform(_ action: Action) {
         log.debug("action \(action.rawValue, privacy: .public)")

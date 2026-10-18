@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // tiler-users.rebuild.mjs — rebuild "tiler-users.html" with the current NBG Design editing tools.
 //
-// Written by the nbg-design skill (scripts/write-rebuild-script.mjs) on 2026-10-10,
-// when the deck was delivered with editor block v17 (plugin 1.25.0).
+// Written by the nbg-design skill (scripts/write-rebuild-script.mjs) on 2026-10-18,
+// when the deck was delivered with editor block v17 (plugin 1.26.0).
 // The deck carries the in-deck editing tools (right-click menu, text and shape toolbars, structure
 // panel, AI assistant, "Export to PDF", "Save edited copy") as one inlined script block. Those tools
 // evolve with the skill; the deck does not. Run this script after the nbg-design skill / plugin was
@@ -21,7 +21,7 @@
 //   NBG_DESIGN_SCRIPTS=<dir>    environment;
 //   the plugin registry         the CURRENT install of nbg-design@nbg-design
 //                               in Claude Code's plugins/installed_plugins.json;
-//   the recorded directory      /Users/giorgosmarinos/.claude/plugins/cache/nbg-design/nbg-design/1.25.0/skills/nbg-design/scripts
+//   the recorded directory      /Users/giorgosmarinos/.claude/plugins/cache/nbg-design/nbg-design/1.26.0/skills/nbg-design/scripts
 //                               (where the skill was when this script was last written).
 // The directory must hold add-deck-menu.mjs, verify-deck.mjs, export-pdf.mjs and lib/ (the skill's
 // scripts/ folder). Anything else is an error. After a rebuild this script rewrites its own record from
@@ -37,15 +37,15 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const RECORD = {
-  "generated": "2026-10-10T19:31:07.788Z",
+  "generated": "2026-10-18T21:44:20.686Z",
   "deck": "tiler-users.html",
   "pdf": "tiler-users.pdf",
-  "scriptsDir": "/Users/giorgosmarinos/.claude/plugins/cache/nbg-design/nbg-design/1.25.0/skills/nbg-design/scripts",
+  "scriptsDir": "/Users/giorgosmarinos/.claude/plugins/cache/nbg-design/nbg-design/1.26.0/skills/nbg-design/scripts",
   "pluginKey": "nbg-design@nbg-design",
   "pluginSubpath": "skills/nbg-design/scripts",
   "blockVersion": 17,
   "shippedVersion": 17,
-  "pluginVersion": "1.25.0",
+  "pluginVersion": "1.26.0",
   "config": {
     "theme": "biks2013"
   },

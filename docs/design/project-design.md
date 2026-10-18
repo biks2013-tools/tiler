@@ -198,6 +198,30 @@ Measured: 0 CPU at rest (no callback runs without a click). Checked live: an unt
 exactly the drag distance with no text selected in TextEdit; plain drags and other modifier sets
 reach the app; on a tiled desktop a drop on another tile swaps, a short drag snaps back.
 
+### Active window frame (`ActiveBorder`)
+
+`activeBorder` (`"#RRGGBB"` or `"none"`, template `"#90EE90"`) and `activeBorderWidth` (1...12,
+template 4) draw a frame around the focused window on a visible tiled desktop:
+
+- **One overlay.** A borderless, non-activating, click-through, transparent `NSPanel` at normal
+  level, ordered directly above the target with `order(.above, relativeTo: windowID)`: windows
+  stacked above the target (a floating window, a dialog) still cover the frame where they
+  overlap. Collection behaviour `managed` + `ignoresCycle` + `fullScreenNone`: it stays on the
+  desktop it was shown on.
+- **Geometry.** The window's frame as its app reports it (AX, read on the app's thread after any
+  frame Tiler is writing), because the window-server list can lag a moment behind a resize the
+  app has already reported (a window closes, its neighbour grows, and the frame kept the old
+  size); the window-server bounds are used only when the app gives none. A generation counter
+  drops answers overtaken by a newer update, and each layout schedules one recheck 0.25 s later
+  for apps that settle on their own size without notifying. Expanded by the width; the ring is stroked inside that rect, outside the window's edges (in the
+  gap between tiles), with rounded corners following the window's.
+- **Updates, no polling.** `Controller.updateBorder` runs on focus changes and everything else
+  that calls `updateHotkeys` (Space and display changes, desktop toggles, config reloads), at the
+  end of each reconcile, after a drop, and on moved/resized notifications of the framed window.
+  It hides the frame while a window is dragged (title bar or modifier + drag), when the focused
+  window is not one the visible tiled desktop owns, when it is off screen, and when the setting
+  is `"none"`.
+
 ### Focus follows mouse
 
 Optional (`focusFollowsMouse`, off in the template; delay `focusDelay`). Designed so it costs

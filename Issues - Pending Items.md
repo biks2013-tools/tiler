@@ -46,6 +46,19 @@
 
 ## Completed
 
+- **2026-10-18 — Light-green frame around the active window on tiled desktops.** Requested by
+  the user. `ActiveBorder` (one click-through overlay ordered just above the focused window),
+  config keys `activeBorder` (`"#90EE90"`) and `activeBorderWidth` (4), Settings → General →
+  Active window. Both keys were added to the user's config directly (backup kept outside the
+  repo); other configs get them through Add Missing Settings. Checked live with a standalone
+  driver: the ring drew outside the window's edges with matching corners, ordered above the
+  window and below the window stacked above it. Not yet exercised inside Tiler on a tiled
+  desktop (none was tiled at the time).
+  Follow-up (reported 2026-10-19): after closing a window, the frame kept the remaining window's
+  old (half-width) size while the window grew. Cause: the frame read the window-server bounds,
+  which lag behind the app's resize, and nothing refreshed it after. Fix: read the frame from the
+  app (AX), drop answers overtaken by newer updates, and recheck once 0.25 s after each layout.
+
 - **2026-10-11 — Focus follows mouse raised tiled windows over untiled ones.** Reported: moving
   the mouse over a tiled window must not make it cover an untiled window. Cause: focus follows
   mouse focused and raised (`AppHandle.focus`) the window under the pointer, which put a tiled
