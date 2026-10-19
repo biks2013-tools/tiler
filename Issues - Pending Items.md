@@ -46,6 +46,19 @@
 
 ## Completed
 
+- **2026-10-19 — Duplicate Homebrew tap, and a runbook test step that left install records.**
+  This Mac had two clones of `biks2013-tools/homebrew-tiler`: `biks2013-tools/tiler`, the name
+  the README, INSTALL.txt and the runbook use, and a stray `biks2013/tiler`. With both present,
+  `brew info tiler` failed as ambiguous, and the 0.8.2 release had recorded the installed app
+  against the stray clone. (The 0.8.2 report wrongly said the runbook's tap name was wrong.)
+  Fix: the app was reinstalled from `biks2013-tools/tiler/tiler` and `biks2013/tiler` was untapped. The
+  reinstall briefly quit Tiler, which was relaunched with Accessibility intact; it passed Gatekeeper as
+  `Notarized Developer ID`. The runbook's step 0.5 now checks that exactly one clone exists.
+  Step 7 replaces the scratch `brew install --appdir=<temp dir>` with `brew fetch` (download
+  plus sha256) and `spctl` on the unzipped app. A scratch install left a record pointing at the temp dir
+  that broke the next install, and removing that record runs `uninstall quit:`, which quits
+  the running Tiler. The new step was run and passes.
+
 - **2026-10-18 — Light-green frame around the active window on tiled desktops.** Requested by
   the user. `ActiveBorder` (one click-through overlay ordered just above the focused window),
   config keys `activeBorder` (`"#90EE90"`) and `activeBorderWidth` (4), Settings → General →

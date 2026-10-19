@@ -20,7 +20,7 @@ Last verified: 2026-10-10 (`v0.2.0`, build 1). macOS 27.0, Xcode 27.0.
 | 0.2 | Developer ID Application certificate | `security find-identity -v -p codesigning` lists `Developer ID Application: GEORGIOS MARINOS (9F9H8NCAUB)` | Xcode → Settings → Accounts → Manage Certificates |
 | 0.3 | notarytool profile `tiler-notary` | `xcrun notarytool history --keychain-profile tiler-notary` | See below |
 | 0.4 | GitHub CLI logged in as `BikS2013` | `gh auth status` | `gh auth login` |
-| 0.5 | Homebrew clone of the tap | `git -C "$(brew --repo biks2013-tools/tiler)" remote -v` | `brew tap biks2013-tools/tiler` |
+| 0.5 | Homebrew clone of the tap, and only one | `brew tap \| grep tiler` prints exactly `biks2013-tools/tiler` | `brew tap biks2013-tools/tiler`; `brew untap` any other clone (a second clone such as `biks2013/tiler` makes `tiler` ambiguous) |
 
 Two Developer ID identities share the same name (`2C7D6068C232BA74073D56085DDBB04E5F14DF30` and
 `CEC7876107F7ED244ACA2B9ED7D6E9DE0056931C`, both expiring 2027-02-01): sign by SHA-1. Releases
@@ -95,10 +95,19 @@ git -C "$TAP" pull -q origin main
 cp homebrew-tap/Casks/tiler.rb "$TAP/Casks/tiler.rb" && cp homebrew-tap/README.md "$TAP/README.md"
 git -C "$TAP" add Casks/tiler.rb README.md && git -C "$TAP" commit -m "tiler <version>" && git -C "$TAP" push origin main
 brew audit --cask --online biks2013-tools/tiler/tiler
-brew install --cask --appdir="$(mktemp -d)" biks2013-tools/tiler/tiler   # scratch install test
+brew fetch --cask --force biks2013-tools/tiler/tiler   # downloads the release zip, checks its sha256
+SCRATCH="$(mktemp -d)" && ditto -x -k "$(brew --cache --cask biks2013-tools/tiler/tiler)" "$SCRATCH"
+spctl -a -vv "$SCRATCH/Tiler.app"   # accepted, source=Notarized Developer ID
+rm -rf "$SCRATCH"
 ```
 
-Do not `brew install` into `/Applications` while Tiler runs from there: `uninstall quit:` quits it.
+Test the cask with `brew fetch`, never with a scratch `brew install --appdir=<temp dir>`: that
+leaves an install record pointing at the temp dir, which breaks the next `brew install` or
+`brew upgrade`, and removing it runs the cask's `uninstall quit:`, which quits the running Tiler.
+
+To update your own copy, `brew upgrade --cask biks2013-tools/tiler/tiler`. It quits Tiler
+(`uninstall quit:`), so relaunch it afterwards. Accessibility permission carries over: it is
+tied to the signature, not to the copy.
 
 ## 8. Decks (GitHub Pages)
 
