@@ -43,6 +43,7 @@ float, and Launch at Login.
 | `⌃⌘M` | Move or resize the focused untiled window with the keyboard (works everywhere, see below) |
 | `⌥⌘M` | Unminimize every minimized window of the frontmost app (works everywhere; on a tiled desktop they rejoin the layout). Replaces the system's ⌥⌘M "Minimize All" in apps that have it; rebind it in Settings if you use that |
 | `⌃⌘,` / `⌃⌘.` | Move the focused window to the previous / next desktop and follow it (works everywhere, see below) |
+| `⌃⌘H` | Bring the focused window to the screen under the pointer, onto the desktop showing there (works everywhere, see below) |
 
 ### Sending a window to another desktop
 
@@ -56,6 +57,15 @@ do by hand: it holds the window by its title bar and presses your Mission Contro
 **Move left/right a space**. Keep those two shortcuts turned on in System Settings → Keyboard →
 Keyboard Shortcuts → Mission Control (they are on by default; a customised key is fine). Tiler
 says so if there is no desktop on that side, or if it is a full-screen app's space.
+
+`⌃⌘H` brings the focused window **here**: onto the desktop showing on the screen the pointer is
+on. Pick the app with ⌘Tab, then press it. The window can be on another desktop of the same
+screen (macOS leaves it there when **When switching to an application, switch to a Space with
+open windows** is off), or on another screen. Coming from another desktop, you briefly see Tiler
+fetch it with your Mission Control shortcuts. From another screen, it keeps its size (shrunk if
+the screen is smaller) and its relative place. If the desktop it lands on is tiled, the window
+joins its layout; if it left a tiled desktop, it drops out of that layout; a floating window stays
+floating. Tiler says so if the window is already here or the screen shows a full-screen app.
 
 ### Frame around the active window
 

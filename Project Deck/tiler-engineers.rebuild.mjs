@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // tiler-engineers.rebuild.mjs — rebuild "tiler-engineers.html" with the current NBG Design editing tools.
 //
-// Written by the nbg-design skill (scripts/write-rebuild-script.mjs) on 2026-10-18,
+// Written by the nbg-design skill (scripts/write-rebuild-script.mjs) on 2026-10-24,
 // when the deck was delivered with editor block v17 (plugin 1.26.0).
 // The deck carries the in-deck editing tools (right-click menu, text and shape toolbars, structure
 // panel, AI assistant, "Export to PDF", "Save edited copy") as one inlined script block. Those tools
@@ -37,7 +37,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 const RECORD = {
-  "generated": "2026-10-18T21:44:21.773Z",
+  "generated": "2026-10-24T03:25:09.632Z",
   "deck": "tiler-engineers.html",
   "pdf": "tiler-engineers.pdf",
   "scriptsDir": "/Users/giorgosmarinos/.claude/plugins/cache/nbg-design/nbg-design/1.26.0/skills/nbg-design/scripts",

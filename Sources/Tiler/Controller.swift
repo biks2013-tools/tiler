@@ -23,6 +23,7 @@ final class Controller {
     var onMoveResize: (() -> Void)?
     /// A move-window-to-desktop shortcut was pressed (true = next desktop).
     var onMoveToDesktop: ((Bool) -> Void)?
+    var onMoveToPointerDisplay: (() -> Void)?
     /// The window being carried to another desktop: its synthetic drag is not
     /// a user drag, and reconcile waits until it has landed.
     private var movingWindow: CGWindowID?
@@ -144,6 +145,8 @@ final class Controller {
             onMoveToDesktop?(true)
         case "previousdesktop":
             onMoveToDesktop?(false)
+        case "here":
+            onMoveToPointerDisplay?()
         case "dump":
             for d in desktops.values {
                 let visible = Spaces.current(onDisplay: d.key.displayUUID) == d.spaceID
@@ -875,6 +878,9 @@ final class Controller {
         case .windowToPreviousDesktop, .windowToNextDesktop:
             onMoveToDesktop?(action == .windowToNextDesktop)
             return
+        case .windowToPointerDisplay:
+            onMoveToPointerDisplay?()
+            return
         case .unminimizeAll:
             unminimizeFrontApp()
             return
@@ -934,7 +940,8 @@ final class Controller {
             rechecked.removeAll()
             layout(d)
             reconcile()
-        case .toggleDesktop, .showHotkeys, .moveResize, .unminimizeAll, .windowToPreviousDesktop, .windowToNextDesktop:
+        case .toggleDesktop, .showHotkeys, .moveResize, .unminimizeAll, .windowToPreviousDesktop, .windowToNextDesktop,
+             .windowToPointerDisplay:
             break
         }
     }

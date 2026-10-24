@@ -42,8 +42,9 @@ Actions: `toggleDesktop`, `focusLeft/Right/Up/Down`, `swapLeft/Right/Up/Down`,
 (template `alt+cmd+m`, restores every minimized window of the frontmost app; it takes over the
 system's ⌥⌘M "Minimize All" in apps that have it),
 `windowToPreviousDesktop` / `windowToNextDesktop` (templates `ctrl+cmd+,` / `ctrl+cmd+.`, carry the
-focused window to the neighbouring desktop). `toggleDesktop`, `showHotkeys`, `moveResize`, `unminimizeAll`
-and the two desktop moves work on every desktop; the rest only while a tiled desktop has focus.
+focused window to the neighbouring desktop), `windowToPointerDisplay` (template `ctrl+cmd+h`, brings
+the focused window to the desktop showing on the screen under the pointer). `toggleDesktop`,
+`showHotkeys`, `moveResize`, `unminimizeAll` and the three window moves work on every desktop; the rest only while a tiled desktop has focus.
 
 The desktop moves also depend on a macOS setting outside Tiler: System Settings → Keyboard →
 Keyboard Shortcuts → Mission Control → **Move left a space** / **Move right a space** must be on

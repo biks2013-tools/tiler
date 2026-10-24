@@ -453,7 +453,7 @@ private struct ShortcutsPane: View {
                     Text(group.rawValue)
                 } footer: {
                     if group == .desktops {
-                        Footnote("These work on every desktop. They carry the focused window to the previous or next desktop on its display, and you follow it. Tiler uses your Mission Control shortcuts “Move left/right a space” (System Settings › Keyboard › Keyboard Shortcuts), so keep those turned on.")
+                        Footnote("These work on every desktop. The first two carry the focused window to the previous or next desktop on its display, and you follow it; the third brings it to the desktop showing on the screen under the pointer. Tiler uses your Mission Control shortcuts “Move left/right a space” (System Settings › Keyboard › Keyboard Shortcuts), so keep those turned on.")
                     }
                     if group == .general {
                         Footnote("These work on every desktop. Move or resize acts on the focused window when Tiler is not tiling it: arrows move, ⇧ arrows resize, ⌥ for fine steps, C centres, M fills, Return or Esc ends. All other shortcuts work only while a tiled desktop has focus, so apps keep the same keys everywhere else.")

@@ -148,6 +148,29 @@ the user would:
    if it floated and the target desktop is tiled, it floats there with the same frame. Reconcile
    then tiles it on a tiled target. The window is refocused.
 
+**Here: the desktop on the screen under the pointer** (`windowToPointerDisplay`, `⌃⌘H`, every
+desktop, `DesktopMover.moveToPointerDisplay`). The usual case is ⌘Tab with macOS set not to switch
+Spaces for the app (`com.apple.dock workspaces-auto-swoosh` = 0): the app is active, its window is
+on another desktop.
+
+1. Target = the screen under the pointer and its current Space; refuse a full-screen Space.
+2. Read the focused window as above (refuse a non-standard one), its screen (frame centre) and its
+   Spaces (`SLSCopySpacesForWindows`, read-only). It is *hidden* when none of them is its
+   screen's current Space. Same screen and not hidden: "Already here" note.
+3. `beginDesktopMove`.
+4. Hidden: `carry` it to its screen's current Space. Warp the pointer to the grab point (the
+   shortcuts act on the screen under the pointer); press the Mission Control shortcut toward the
+   window's desktop once per desktop in between, each after the previous switch has finished (a
+   bounded 50 ms check of `SLSManagedDisplayGetCurrentSpace`/`IsAnimating`, at most 1.5 s, then
+   0.1 s); hold the title bar as in step 5 above; press the opposite shortcut the same number of
+   times; release; pointer back. Success when the screen is back on its Space and the window is on
+   it. Refuse when the window's Space is full screen or a shortcut is off.
+5. Other screen: `Geometry.place` (TilerCore: same size shrunk to the target's usable area, same
+   relative position, offset ÷ free room per axis) and one frame write on the `WindowMover` thread.
+   A window written onto another display joins that display's current Space.
+6. `endDesktopMove(display: target, to: space)` on success (tiled/floating carry-over and
+   reconcile exactly as step 6 above) and refocus; otherwise a HUD note and `endDesktopMove(to: nil)`.
+
 
 ### Unminimize all (`unminimizeAll`)
 
@@ -315,7 +338,7 @@ All are read-only or focus-related; Tiler never moves windows between Spaces (br
 | Path | Role |
 |---|---|
 | `Sources/TilerCore/BSPTree.swift` | Dwindle tree, layout, divider moves, drag-resize adoption |
-| `Sources/TilerCore/Geometry.swift` | Directional neighbour, hit testing |
+| `Sources/TilerCore/Geometry.swift` | Directional neighbour, hit testing, placing a frame on another screen |
 | `Sources/TilerCore/Config.swift` | Strict config parsing and writing, actions (titles, groups), key combos (symbols, recorder init), template |
 | `Sources/Tiler/Controller.swift` | State, events, reconcile, layout, hotkey actions, drags |
 | `Sources/Tiler/AppHandle.swift` | Per-app thread, AX observer, reads/writes |
@@ -325,7 +348,7 @@ All are read-only or focus-related; Tiler never moves windows between Spaces (br
 | `Sources/Tiler/ShortcutsOverlay.swift` | Keyboard shortcuts HUD |
 | `Sources/Tiler/MoveResizeMode.swift` | Move/resize mode, `WindowMover` thread, its HUD |
 | `Sources/Tiler/HUDPanel.swift` | Shared non-activating HUD panel |
-| `Sources/Tiler/DesktopMover.swift` | Move the focused window to the previous/next desktop |
+| `Sources/Tiler/DesktopMover.swift` | Move the focused window to the previous/next desktop, or to the screen under the pointer |
 | `Sources/TilerCore/WindowNudge.swift` | Move/resize arithmetic (pure, tested) |
 | `Sources/Tiler/Settings.swift` | Settings window, model and panes (incl. shortcut recorder) |
 | `Sources/Tiler/Appearance.swift` | Menu bar glyph, key caps view, menu key equivalents |

@@ -15,12 +15,14 @@ public enum Action: String, CaseIterable, Codable {
     case moveResize
     case unminimizeAll
     case windowToPreviousDesktop, windowToNextDesktop
+    case windowToPointerDisplay
 
     /// `toggleDesktop`, `showHotkeys` and `moveResize` stay registered on desktops
     /// Tiler does not tile; every other hotkey is released there so apps keep the key.
     public var worksOnUntiledDesktop: Bool {
         switch self {
-        case .toggleDesktop, .showHotkeys, .moveResize, .unminimizeAll, .windowToPreviousDesktop, .windowToNextDesktop: return true
+        case .toggleDesktop, .showHotkeys, .moveResize, .unminimizeAll, .windowToPreviousDesktop, .windowToNextDesktop,
+             .windowToPointerDisplay: return true
         default: return false
         }
     }
@@ -34,6 +36,7 @@ public enum Action: String, CaseIterable, Codable {
         case .unminimizeAll: return "Unminimize the app's windows"
         case .windowToPreviousDesktop: return "Move window to previous desktop"
         case .windowToNextDesktop: return "Move window to next desktop"
+        case .windowToPointerDisplay: return "Move window to the screen under the pointer"
         case .focusLeft: return "Focus left"
         case .focusRight: return "Focus right"
         case .focusUp: return "Focus up"
@@ -61,7 +64,7 @@ public enum Action: String, CaseIterable, Codable {
     public var group: Group {
         switch self {
         case .toggleDesktop, .showHotkeys, .moveResize, .unminimizeAll: return .general
-        case .windowToPreviousDesktop, .windowToNextDesktop: return .desktops
+        case .windowToPreviousDesktop, .windowToNextDesktop, .windowToPointerDisplay: return .desktops
         case .focusLeft, .focusRight, .focusUp, .focusDown: return .focus
         case .swapLeft, .swapRight, .swapUp, .swapDown: return .swap
         case .resizeLeft, .resizeRight, .resizeUp, .resizeDown: return .resize
@@ -443,7 +446,8 @@ public struct Config: Equatable {
         "moveResize": "ctrl+cmd+m",
         "unminimizeAll": "alt+cmd+m",
         "windowToPreviousDesktop": "ctrl+cmd+,",
-        "windowToNextDesktop": "ctrl+cmd+."
+        "windowToNextDesktop": "ctrl+cmd+.",
+        "windowToPointerDisplay": "ctrl+cmd+h"
       }
     }
 

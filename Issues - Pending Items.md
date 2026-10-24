@@ -46,6 +46,28 @@
 
 ## Completed
 
+- **2026-10-24 — ⌃⌘H said "already on this screen" for a window on another desktop.** Reported
+  by the user: ⌘Tab to an app, then ⌃⌘H, and the window never appeared. Cause: macOS is set not to
+  switch Spaces for the app (`workspaces-auto-swoosh` = 0), so its window sat on another desktop of
+  the same screen, and the first version only compared screens. Fix: the window's Spaces are read
+  (`SLSCopySpacesForWindows`); a window on a hidden desktop is carried to the current one with the
+  user's Mission Control shortcuts and a held title bar, stepping once per desktop in between, and
+  then moved to the pointer's screen if that is another one. No Space-mutation API is used. Checked
+  live with a test window on the next desktop: pointer on the same screen (arrived, visible,
+  focused) and on the other screen (arrived on that screen's desktop; the source screen went back
+  to its desktop). The other-screen case and the unit tests still pass.
+
+- **2026-10-24 — Shortcut to bring the focused window to the screen under the pointer.**
+  Requested by the user. New action `windowToPointerDisplay` (template `ctrl+cmd+h`, every
+  desktop, Desktops group): `DesktopMover.moveToPointerDisplay` writes the window's frame onto the
+  pointer's screen (same size shrunk to fit, same relative position, `Geometry.place`), which puts it
+  on that screen's current desktop; `endDesktopMove` carries tiled/floating state over and reconcile
+  tiles it on a tiled target. `tiler-ctl.sh here` triggers it. Added to the user's config directly
+  (backup kept outside the repo); other configs get it through Add Missing Settings. 35 tests pass.
+  Checked live with a test window: untiled target (kept size, relative place, focus; a second
+  press on the same screen did nothing), tiled empty target (filled the desktop), and back to the
+  untiled screen (left that layout).
+
 - **2026-10-19 — Duplicate Homebrew tap, and a runbook test step that left install records.**
   This Mac had two clones of `biks2013-tools/homebrew-tiler`: `biks2013-tools/tiler`, the name
   the README, INSTALL.txt and the runbook use, and a stray `biks2013/tiler`. With both present,

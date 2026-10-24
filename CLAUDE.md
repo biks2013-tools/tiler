@@ -1,10 +1,10 @@
 <structure-and-conventions>
 ## Structure & Conventions — Documentation Map
 
-<!-- Maintained automatically. The master copy lives at
-     ~/.claude/structure-and-conventions.md (claude-workdocs repo) and the SessionStart
-     hook ~/.claude/scripts/sync-claude-md.sh keeps this copy of the block up to date —
-     edit the master, never this block. The block is committed with the repository on
+<!-- Maintained automatically. The master copy is block/structure-and-conventions.md in
+     the structure-and-conventions Claude Code plugin (repository
+     BikS2013-coding-agents/structure-and-conventions-repo), which checks this copy at
+     every session start and brings it up to date — edit the master, never this block. The block is committed with the repository on
      purpose: it tells anyone (human or agent) working with this repo where the
      project's documentation lives and how to read and maintain it. -->
 
@@ -58,7 +58,8 @@ desktops (display + Space) the user turns on. Design: `docs/design/project-desig
 
 - Never touch windows outside a tiled desktop's display **and** Space. Exceptions, all explicit
   user requests on one window: the move/resize mode (`MoveResizeMode`) and moving a window to
-  the previous/next desktop (`DesktopMover`), both on the focused window, unminimizing the
+  the previous/next desktop or to the screen under the pointer (`DesktopMover`), all on the
+  focused window, unminimizing the
   frontmost app's windows (`unminimizeAll`), and modifier + drag (`WindowDrag`) on the window
   under the pointer.
 - Never call Space-mutation APIs. Moving a window to another desktop drives the user's own
@@ -89,4 +90,4 @@ desktops (display + Space) the user turns on. Design: `docs/design/project-desig
 - Release: `TILER_SIGN_IDENTITY=2C7D6068C232BA74073D56085DDBB04E5F14DF30 NOTARY_PROFILE=tiler-notary scripts/package.sh`,
   then `docs/design/release-runbook.md` (GitHub `biks2013-tools/tiler`, tap `biks2013-tools/homebrew-tiler`)
 - Decks: `Project Deck/` (nbg-design skill, BikS2013 theme), published with GitHub Pages
-- `scripts/tiler-ctl.sh toggle active | retile | reload | settings | shortcuts | moveresize | unminimize | nextdesktop | previousdesktop | dump`
+- `scripts/tiler-ctl.sh toggle active | retile | reload | settings | shortcuts | moveresize | unminimize | nextdesktop | previousdesktop | here | dump`

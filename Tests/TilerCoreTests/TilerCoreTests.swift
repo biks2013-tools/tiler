@@ -222,6 +222,28 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(Action.windowToPreviousDesktop.group, .desktops)
     }
 
+    func testWindowToPointerDisplayDefaults() throws {
+        XCTAssertEqual(Config.defaults.hotkeys[.windowToPointerDisplay]?.symbols, "⌃⌘H")
+        XCTAssertTrue(Action.windowToPointerDisplay.worksOnUntiledDesktop)
+        XCTAssertEqual(Action.windowToPointerDisplay.group, .desktops)
+    }
+
+    func testPlaceOnAnotherDisplay() {
+        let big = CGRect(x: 0, y: 25, width: 2560, height: 1415)
+        let small = CGRect(x: 2560, y: 25, width: 1512, height: 957)
+        // Top-left corner stays top-left; size kept when it fits.
+        XCTAssertEqual(Geometry.place(CGRect(x: 0, y: 25, width: 800, height: 600), from: big, to: small),
+                       CGRect(x: 2560, y: 25, width: 800, height: 600))
+        // Centred (to the pixel) stays centred.
+        XCTAssertEqual(Geometry.place(CGRect(x: 880, y: 432, width: 800, height: 600), from: big, to: small),
+                       CGRect(x: 2916, y: 203, width: 800, height: 600))
+        // Too big: shrunk to the target's usable area.
+        XCTAssertEqual(Geometry.place(CGRect(x: 8, y: 33, width: 2544, height: 1399), from: big, to: small), small)
+        // Unknown source: centred.
+        XCTAssertEqual(Geometry.place(CGRect(x: -5000, y: 0, width: 512, height: 357), from: nil, to: small),
+                       CGRect(x: 3060, y: 325, width: 512, height: 357))
+    }
+
     func testUnminimizeWorksEverywhereWithDefaults() {
         XCTAssertEqual(Config.defaults.hotkeys[.unminimizeAll]?.symbols, "⌥⌘M")
         XCTAssertTrue(Action.unminimizeAll.worksOnUntiledDesktop)

@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let desktopMover = DesktopMover(controller: controller)
         self.desktopMover = desktopMover
         controller.onMoveToDesktop = { forward in overlay.close(); moveResize.end(); desktopMover.move(forward: forward) }
+        controller.onMoveToPointerDisplay = { overlay.close(); moveResize.end(); desktopMover.moveToPointerDisplay() }
         menu.onShowSettings = { [weak self] pane in self?.showSettings(pane) }
         controller.onShowHotkeys = { moveResize.end(); overlay.toggle() }
         controller.onShowSettings = { [weak self] in self?.showSettings(nil) }
