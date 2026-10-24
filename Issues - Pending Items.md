@@ -215,6 +215,17 @@
 
 ## Release log
 
+- **2026-10-24 — v0.8.3 (build 20).** Bring the focused window here (`⌃⌘H`,
+  `windowToPointerDisplay`): from a hidden desktop via the Mission Control shortcuts, from another
+  screen by one frame write. 35 tests passed; app and disk image `status: Accepted`,
+  `source=Notarized Developer ID`. Zip SHA-256
+  `aef674c4d13a59f56d61afc55a9be20947bb790be82f461dc4849e65a23ffb57` (download verified), DMG
+  `50656003c7608517b7d7863a76901cd0d82f3e7b683f1d3605d3fbada8e1e79b`. GitHub marks v0.8.3 Latest. Tap
+  commit `tiler 0.8.3` (aa5560f); `brew audit` clean; `brew fetch` + `spctl` on the cask's zip
+  accepted (the runbook's new test step, first used here). This Mac upgraded with
+  `brew upgrade --cask`, so brew records 0.8.3; Tiler relaunched. Pages serves the 0.8.3 decks. Config
+  gains `hotkeys.windowToPointerDisplay` (Add Missing Settings).
+
 - **2026-10-19 — v0.8.2 (build 19).** Light-green frame around the active window on tiled
   desktops; focus follows mouse no longer raises a tiled window over an untiled one. 33 tests
   passed; app and disk image `status: Accepted`, `source=Notarized Developer ID`. Zip SHA-256
